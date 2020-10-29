@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+	<flow name="getPersonByIsolationDays" doc:id="120e0dd6-4c55-4704-af65-de29311ddf57" >
+		<set-variable value="#[message.attributes.queryParams.isolationDays]" doc:name="Set Variable" doc:id="bc665d0c-501a-4f31-94ea-99e85ca03e80" variableName="getDays"/>
+		<choice doc:name="Choice" doc:id="a877d040-300e-466a-86be-93c83fc05d6e" >
+			<when expression="#[vars.getDays=='14']">
+				<db:select doc:name="Select" doc:id="dc90b646-fd58-439c-b926-8dad125998bc" config-ref="Database_Config">
+			<db:sql><![CDATA[SELECT * FROM PersonInIsolation WHERE isolationDays=:isolationDays]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+	isolationDays: vars.getDays
+}]]]></db:input-parameters>
+		</db:select>
+				<ee:transform doc:name="Transform Message" doc:id="f9487f17-1de6-48b3-90c7-00fbeede5871" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	jmbg: payload.jmbg default "",
+	name: payload.name default "",
+	surname: payload.surname default "",
+	citizenship: payload.citizenship default "",
+	symptoms: payload.symptoms default "",
+	homeIsolation: payload.homeIsolation default 0,
+	dateStart: payload.dateStart as String default "",
+	dateEnd: payload.dateEnd as String default "",
+	isolationDays: vars.getDays as Number
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression="#[vars.getDays=='28']">
+				<db:select doc:name="Select" doc:id="474eb2d0-eed1-4db7-b9ea-9672c8294373" config-ref="Database_Config">
+					<db:sql ><![CDATA[SELECT * FROM PersonInIsolation WHERE isolationDays=:isolationDays]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{isolationDays : vars.getDays}]]]></db:input-parameters>
+				</db:select>
+				<ee:transform doc:name="Transform Message" doc:id="4bf56148-3caf-4787-9064-adab0306e533" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	jmbg: payload.jmbg default "",
+	name: payload.name default "",
+	surname: payload.surname default "",
+	citizenship: payload.citizenship default "",
+	symptoms: payload.symptoms default "",
+	homeIsolation: payload.homeIsolation default 0,
+	dateStart: payload.dateStart as String default "",
+	dateEnd: payload.dateEnd as String default "",
+	isolationDays: vars.getDays as Number
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise>
+				<db:select doc:name="Select" doc:id="6a9f13b2-f8be-4dd2-8571-673b9d1151a1" config-ref="Database_Config">
+					<db:sql ><![CDATA[select * from personinisolation]]></db:sql>
+				</db:select>
+				<ee:transform doc:name="Transform Message" doc:id="7c4a0f9e-9703-4e76-b8a8-170b7cb45760">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	jmbg: payload.jmbg default "",
+	name: payload.name default "",
+	surname: payload.surname default "",
+	citizenship: payload.citizenship default "",
+	symptoms: payload.symptoms default "",
+	homeIsolation: payload.homeIsolation default 0,
+	dateStart: payload.dateStart as String default "",
+	dateEnd: payload.dateEnd as String default "",
+	isolationDays: payload.isolationDays default 0
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="Logger" doc:id="d76f7671-243a-4255-8b9f-0efa8e822f49" />
+	</flow>
+	<flow name="getById" doc:id="33256060-17f5-49e5-a2d5-0e9a1200f903" >
+		<set-variable value="#[message.attributes.uriParams.idPersonInIsolation]" doc:name="Set Variable" doc:id="171eba5f-da2e-4126-a372-d5ca4343a8c2" variableName="getId"/>
+		<db:select doc:name="Select" doc:id="df3dd0ee-fef4-4420-b7dc-9d15984cd5d8" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * FROM personinisolation WHERE idPersonInIsolation=:idPersonInIsolation]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{idPersonInIsolation: vars.getId}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-true doc:name="Is true" doc:id="4add01d4-06e5-4ba5-bb63-fe3eb92d6363" expression="#[!(sizeOf(payload)==0)]" message="Person Not Found">
+			<error-mapping targetType="APP:PERSON" />
+		</validation:is-true>
+		<ee:transform doc:name="Transform Message" doc:id="44928311-a0a4-4837-a1ba-0f25f3d0205d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var dateStart = now() as Date{
+	format : 'yyyy-MM-dd'
+}
+var dateEnd=payload[0].dateEnd as Date{
+	format : 'yyyy-MM-dd'
+}
+---
+{
+	jmbg: payload.jmbg default "",
+	name: payload.name default "",
+	surname: payload.surname default "",
+	"Left Days": daysBetween(dateStart, dateEnd )
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="DWoutput" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	data: payload.jmbg
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="6ded073a-7a36-4042-bd38-5814adf6e8d3" />
+	</flow>
+	<flow name="sendEmail" doc:id="c789aff6-d1a1-460f-b4cf-94946ae61b8d" >
+		<http:listener doc:name="Listener" doc:id="870c5d34-000c-40af-904c-96d87dbb2fc3" config-ref="HTTP_Listener_config" path="send" allowedMethods="POST"/>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="a67bd486-33c9-4bfc-b798-79358adf6219" >
+			<route >
+				<flow-ref doc:name="Flow Reference" doc:id="69e8567f-4f10-4dbd-9058-d74bf8dd8e30" name="getInIsolation"/>
+			</route>
+			<route >
+				<flow-ref doc:name="Flow Reference" doc:id="9c9fbb6b-4d89-499a-8515-df6b78dcac86" name="getOutOfIsolation"/>
+			</route>
+			<route >
+				<flow-ref doc:name="Flow Reference" doc:id="60b4a2a5-cf1f-4bdb-bd0c-de28f638dcd8" name="getNumberOfHispitals"/>
+			</route>
+			<route >
+				<flow-ref doc:name="Flow Reference" doc:id="82da8818-6c19-4f1e-a5f0-5845ead03086" name="getSymptoms"/>
+			</route>
+		</scatter-gather>
+		<email:send doc:name="Send" doc:id="bcd8dcb1-8f78-4b7f-8092-4a3aad5f5e5d" config-ref="Email_SMTP" fromAddress="andriceva997@gmail.com" subject="Covid19 information">
+			<email:to-addresses >
+				<email:to-address value="mtesic97@gmail.com" />
+			</email:to-addresses>
+			<email:body contentType="text/plain" encoding="UTF-8">
+				<email:content ><![CDATA[#["In isoltation:"  ++ vars.in ++ "\n" ++
+	"Out of isolation:" ++ vars.out ++ "\n" ++
+	"Number of hospital:" ++ vars.hospital ++ "\n" ++
+	"Number with symptoms:" ++ vars.symptoms ++ "\n"]]]></email:content>
+			</email:body>
+		</email:send>
+		<logger level="INFO" doc:name="Logger" doc:id="a418bfaf-49b4-49e0-94d5-538f2e591fdc" message="Poslato"/>
+	</flow>
+	<sub-flow name="getNumberOfHispitals" doc:id="416a15c8-1dab-43a3-b5d1-cec2282000f9" >
+		<db:select doc:name="SelectSpaceFromHospital" doc:id="9e4395dd-3e49-425f-834a-a526e0a28257" config-ref="Database_Config">
+					<db:sql><![CDATA[select count(idHospital)  from hospital]]></db:sql>
+				</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="00aadf39-1dbe-406f-abb9-ee50f316fba7">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload."count(idHospital)"]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value='#[payload[0]]' doc:name="Set Variable" doc:id="3983104b-512b-4151-8ff8-b91797bc56bf" variableName="hospital" />
+	</sub-flow>
+	<sub-flow name="getOutOfIsolation" doc:id="d5225ba3-d59d-40d5-b962-eaee10d994bf" >
+		<db:select doc:name="SelectOutOfIsolation" doc:id="eb02ae96-c22c-4857-abde-4b25295a8b9f" config-ref="Database_Config">
+			<db:sql><![CDATA[select  count(idHistory)  FROM   history]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="e9b9a510-c321-4e30-bbb3-f4029b11db7f">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload."count(idHistory)"]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value='#[payload[0]]' doc:name="Set Variable" doc:id="5537fdce-522a-4eb2-a20e-47a7db6ff9b4" variableName="out" />
+	</sub-flow>
+	<sub-flow name="getInIsolation" doc:id="20059d53-ad8b-48cc-97a6-e19941720bf1" >
+		<db:select doc:name="SelectInIsolations" doc:id="92a80745-21b9-4ea2-9cf3-e21eabf258f4" config-ref="Database_Config">
+					<db:sql><![CDATA[select count(idPersonInIsolation)  from personinisolation]]></db:sql>
+				</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="a3991e78-c758-4fb1-85d2-391b54cf5030">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload."count(idPersonInIsolation)"]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value='#[payload[0]]' doc:name="Set Variable" doc:id="793ee451-9bbb-41e6-a683-7072d1e5c3d0" variableName="in" />
+	</sub-flow>
+	<sub-flow name="getSymptoms" doc:id="de6fd5ba-e098-472e-90ae-aa4eb3441044" >
+		<db:select doc:name="SelectYesSymptoms" doc:id="4bc1d2f6-3677-494d-b845-d1daa38b845d" config-ref="Database_Config">
+			<db:sql><![CDATA[SELECT COUNT(symptoms) FROM PersonInIsolation WHERE symptoms="yes" group by symptoms]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="8851ff6f-37ed-4696-bd50-d9494ee4e9eb">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload."COUNT(symptoms)"]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value='#[payload[0]]' doc:name="Set Variable" doc:id="60b3c562-3a7a-4f57-8e0f-295ca67c7055" variableName="symptoms"/>
+	</sub-flow>
+	<flow name="delete" doc:id="1a3957d6-0d4b-434c-b764-d1371e2b0559" >
+		<http:listener doc:name="Listener" doc:id="37d4d7e7-489e-4492-bab3-19630e294395" config-ref="HTTP_Listener_config" path="/delete" allowedMethods="GET"/>
+		<db:delete doc:name="Delete" doc:id="7bd0779d-c5f1-48bb-bf68-89a41f5c2b55" config-ref="Database_Config">
+			<db:sql ><![CDATA[delete from personinisolation where DATEDIFF(now(),dateEnd)=0;]]></db:sql>
+		</db:delete>
+		<logger level="INFO" doc:name="Logger" doc:id="58bae917-861a-4b9e-8866-83f1beb0cb8f" />
+	</flow>
+	<flow name="insert" doc:id="ced16342-c63c-4c95-92bc-503c52ecb022" >
+		<validation:is-true doc:name="Is true" doc:id="62dafe10-c2c2-42a6-894e-845f7d65980d" expression='#[payload.citizenship=="Serbian"]' message="Person dosent have Serbian citizenShip">
+			<error-mapping targetType="APP:CITIZENSHIP" />
+		</validation:is-true>
+		<db:insert doc:name="Insert" doc:id="251bfa0f-cdf5-4e90-8e48-439e0a8bd00e" config-ref="Database_Config">
+			<db:sql ><![CDATA[insert into personinisolation (jmbg, name, surname, citizenship, symptoms, homeIsolation, dateStart, dateEnd, isolationDays, State_idState, Hospital_idHospital) values (:jmbg, :name, :surname, :citizenship, :symptoms,:homeIsolation,:dateStart, :dateEnd, :isolationDays, :State_idState, :Hospital_idHospital)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[%dw 2.0
+
+---
+{
+	jmbg : payload.jmbg,
+	name : payload.name,
+	surname: payload.surname,
+	citizenship : payload.citizenship,
+	symptoms : payload.symptoms,
+	homeIsolation : payload.homeIsolation,
+	dateStart: payload.dateStart,
+	dateEnd: payload.dateEnd,
+	isolationDays: payload.isolationDays,
+	State_idState: payload.State_idState,
+	Hospital_idHospital: payload.Hospital_idHospital
+	
+}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="54c97957-8051-45d5-8fbf-c0d4c2f47b8b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message" : "Person created"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

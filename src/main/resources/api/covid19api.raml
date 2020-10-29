@@ -1,0 +1,43 @@
+#%RAML 1.0
+baseUri: https://anypoint.mulesoft.com/mocking/api/v1/links/5997c9b8-99dc-4c1e-ac5d-3e874d7b6497/ # 
+title: Covid19API
+version: 1.0
+
+types:
+  Person: !include Covid19DataType/Covid19PersonInIsolationDataType.raml
+  
+/getAllPersonInIsolation:
+  get:
+    queryParameters:
+      isolationDays:
+        required: true
+    responses:
+      200: 
+        description: Successfuly get list 
+        body:
+          application/json:
+            type: Person []
+            examples:
+              output: !include  Covid19Examples/Covid19PersonInIsolationSymptomsNOExample.raml 
+  post:
+    body:
+      application/json:
+        type: Person
+        examples:
+          input: !include Covid19Examples/Covid19PersonInIsolationSymptomsYESExample.raml
+    responses:
+      201:
+        body:
+          application/json:
+            example:
+              message: Person added in data base.
+  /{idPersonInIsolation}:
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              type: Person
+              examples:
+                otput: !include Covid19Examples/Covid19PersonInIsolationSymptomsYESExample.raml
+                                                  

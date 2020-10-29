@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="7434a654-f9a7-4050-bb14-dae8866f5538" >
+		<db:my-sql-connection host="${db.host}" port="${db.port}" user="${db.user}" password="root" database="${db.database}" />
+	</db:config>
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="1f9acf12-d907-4196-bc6b-4f6e76c95192" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="4caacb53-784c-4101-b95a-ae476a6465fe" file="config.yaml" />
+	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="cb7f2b36-2216-41cd-b9f1-7480e7981955" >
+		<email:smtp-connection host="${email.host}" port="${email.port}" user="${email.user}" password="jelena97" >
+			<email:properties >
+				<email:property key="mail.smtp.starttls.enable" value="true" />
+			</email:properties>
+		</email:smtp-connection>
+	</email:smtp-config>
+	<error-handler name="globalError_Handler" doc:id="e7c0aa50-c558-4ee1-82d4-9a67314c227f" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="a9b359cf-318f-420f-81aa-131252571edc" type="APP:QUERY_ERROR">
+			<ee:transform doc:name="Transform Message" doc:id="51b35031-ea04-4690-8e3f-370c706aaf1a" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"errorType" : error.errorType.asString as String,
+	"errorDescription": error.description as String
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<set-variable value="404" doc:name="httpStatus404" doc:id="3a055972-58f9-447c-bec8-32b67facf4f9" variableName="status404"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="a2e4c631-7631-46f5-977d-3e40d45d96ee" type="APP:CITIZENSHIP">
+			<ee:transform doc:name="Transform Message" doc:id="0aa02196-dcce-4c6f-91eb-e2744a08271a">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"errorType" : error.errorType.asString as String,
+	"errorDescription": error.description as String
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<set-variable value="500" doc:name="httpDB" doc:id="91c53aeb-c9bd-448a-94a5-17016273db25" variableName="dbQuery"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="05cb9ce3-3d4a-4f68-8225-58283136134e" type="APP:DUPLICATE_JMBG">
+			<ee:transform doc:name="Transform Message" doc:id="6111a43f-37ad-4735-8a07-aa7b7e597660">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"errorType" : error.errorType.asString as String,
+	"errorDescription": error.description as String
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<set-variable value="500" doc:name="httpStatus" doc:id="429175a6-bef9-49a9-a435-d014ec0eb83e" variableName="http500" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="75600108-1f7e-48e6-92de-c30ce9ca1a85" type="ANY">
+			<ee:transform doc:name="Transform Message" doc:id="028767c5-555b-4680-a1ae-e397d4db00af" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</on-error-propagate>
+	</error-handler>
+</mule>

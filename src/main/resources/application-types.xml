@@ -1,0 +1,135 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="personJson" format="json">
+      <types:shape format="weave" example="examples/person-2.json"><![CDATA[%dw 2.0
+
+type personJson = {|
+  jmbg: String, 
+  name: String, 
+  surname: String, 
+  citizenship: String, 
+  symptoms: String, 
+  homeIsolation: Number {"typeId": "int"}, 
+  dateStart: String, 
+  dateEnd: String, 
+  isolationDays: Number {"typeId": "int"}
+|} {"example": "{\\\"jmbg\\\":\\\"2524589858758\\\",\\\"name\\\":\\\"Janko\\\",\\\"surname\\\":\\\"Jankovic\\\",\\\"citizenship\\\":\\\"Srbija\\\",\\\"symptoms\\\":\\\"yes\\\",\\\"homeIsolation\\\":1,\\\"dateStart\\\":\\\"2020-10-01\\\",\\\"dateEnd\\\":\\\"2020-10-15\\\",\\\"isolationDays\\\":14}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="isolationsDays" format="json">
+      <types:shape format="weave" example="examples/isolations-1.json"><![CDATA[%dw 2.0
+
+type isolationsDays = {|
+  inIsolation: Number {"typeId": "int"}, 
+  outOfIsolation: Number {"typeId": "int"}
+|} {"example": "{\\\"inIsolation\\\":1,\\\"outOfIsolation\\\":1}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="isolation" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: integer]]></types:shape>
+    </types:type>
+    <types:type name="symptomsYES" format="json">
+      <types:shape format="weave" example="examples/symptomsYes.json"><![CDATA[%dw 2.0
+
+type symptomsYES = {| Symptoms: Number {"typeId": "int"} |} {"example": "{\\\"Symptoms\\\":1}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="space" format="json">
+      <types:shape format="weave" example="examples/space.json"><![CDATA[%dw 2.0
+
+type space = {| Space: Number {"typeId": "int"} |} {"example": "{\\\"Space\\\":1}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="days" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: integer]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#f9487f17-1de6-48b3-90c7-00fbeede5871">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="personJson"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#4bf56148-3caf-4787-9064-adab0306e533">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="personJson"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#394846a2-d370-4218-aafe-7ca79b6e9d37">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="isolation"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#a3991e78-c758-4fb1-85d2-391b54cf5030">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="days"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#8851ff6f-37ed-4696-bd50-d9494ee4e9eb">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="days"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#e9b9a510-c321-4e30-bbb3-f4029b11db7f">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="days"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#00aadf39-1dbe-406f-abb9-ee50f316fba7">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="days"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#7c4a0f9e-9703-4e76-b8a8-170b7cb45760">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="personJson"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#44928311-a0a4-4837-a1ba-0f25f3d0205d">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="personJson"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

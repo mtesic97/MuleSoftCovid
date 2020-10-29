@@ -1,0 +1,11 @@
+{
+  "jmbg": "2524589858758",
+  "name": "Janko",
+  "surname": "Jankovic",
+  "citizenship": "Srbija",
+  "symptoms": "yes",
+  "homeIsolation": 1,
+  "dateStart": '2020-10-01',
+  "dateEnd": '2020-10-15',
+  "isolationDays" : 14
+}
